@@ -11,13 +11,15 @@ use App\Models\Reply;
 class DiscussionsController extends Controller
 {
     public function __construct(){
-        $this->middleware('auth')->only(['create','store']);
-
+        $this->middleware(['auth', 'verified'])->only(['create','store']);
     }
     public function index()
     {
+        //to make this filterByChannels() works in the model Discussion,
+        //.. you must make it in a scope, so you can use it staticlly, which means you can use it without
+        //.. making an object of the model, just like that Discussion::filterByChannels()
         return view('discussions.index', [
-            'discussions' => Discussion::paginate(5)
+            'discussions' => Discussion::filterByChannels()->paginate(3)
         ]);
     }
 

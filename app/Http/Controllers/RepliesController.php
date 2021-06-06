@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\CreateReplyRequest;
 use App\Models\Reply;
 use App\Models\Discussion;
-use App\Notification\NewReplyAdded;
+use App\Notifications\NewReplyAdded;
+
 
 class RepliesController extends Controller
 {
@@ -42,8 +43,13 @@ class RepliesController extends Controller
             'content' => $request->content,
             'discussion_id' => $discussion->id
         ]);
+//--------------------------------------------------------------------------
+//                          Notification
+//--------------------------------------------------------------------------
 
-        $discussion->author->notify(new NewReplyAdded());
+        if($discussion->author->id !== auth()->user()->id){
+            $discussion->author->notify(new NewReplyAdded($discussion));
+        }
         return redirect()->back()->with('success', 'Reply Added');
     }
 
